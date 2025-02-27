@@ -1,0 +1,94 @@
+name: Build, test and package
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [labeled, synchronize]
+  workflow_dispatch:
+
+jobs:
+  build:
+    if: github.event.label.name == 'package' || github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: |
+          python -m pytest test/
+
+      - name: Build executable
+        run: |
+          pip install ".[exe]"
+          python setup.py build
+
+      - name: Sign Windows Build
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          WIN_SIGNING_CERT: ${{ secrets.WIN_SIGNING_CERT }}
+          WIN_SIGNING_CERT_PASSWORD: ${{ secrets.WIN_SIGNING_CERT_PASSWORD }}
+        run: |
+          ./scripts/sign-windows.ps1 -CertificateBase64 $env:WIN_SIGNING_CERT -CertificatePassword $env:WIN_SIGNING_CERT_PASSWORD
+
+      - name: Sign macOS Build
+        if: runner.os == 'macOS'
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.MACOS_CERTIFICATE }}
+          P12_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          SIGNING_IDENTITY: ${{ secrets.MACOS_IDENTITY }}
+        run: |
+          chmod +x ./scripts/sign-macos.sh
+          ./scripts/sign-macos.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: opentips-${{ runner.os }}
+          path: build/exe.*/**/*
+
+  release:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Run Release Process
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          chmod +x ./scripts/release.sh
+          ./scripts/release.sh
