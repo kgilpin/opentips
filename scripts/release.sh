@@ -12,7 +12,7 @@ pip install python-semantic-release
 
 # Run semantic-release version and publish
 echo "Running semantic-release..."
-python -m semantic_release version
+python -m semantic_release -vv version
 python -m semantic_release publish
 
 # Build and publish to PyPI
