@@ -6,17 +6,21 @@ if [ -z "$GITHUB_TOKEN" ] || [ -z "$TWINE_USERNAME" ] || [ -z "$TWINE_PASSWORD" 
     exit 1
 fi
 
-# Setup Node and install semantic-release
-echo "Setting up semantic-release..."
-npm install -g semantic-release @semantic-release/git @semantic-release/changelog
+# Install python-semantic-release if not already installed
+echo "Setting up python-semantic-release..."
+pip install python-semantic-release
 
-# Run semantic-release
+# Run semantic-release version and publish
 echo "Running semantic-release..."
-semantic-release
+python -m semantic_release version
+python -m semantic_release publish
 
 # Build and publish to PyPI
 echo "Building Python package..."
 python -m build
 
 echo "Publishing to PyPI..."
-twine upload dist/*
+twine upload --verbose dist/*
+
+echo "Release process completed successfully."
+    
