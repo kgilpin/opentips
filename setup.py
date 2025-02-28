@@ -9,7 +9,6 @@ setup(
     description="Automated assistant that provides coding tips as you work",
     packages=find_packages(),
     install_requires=[
-        "aider-chat~=0.75.1",
         "aiohttp~=3.11.11",
         "jsonrpcserver~=5.0.9",
         "litellm~=1.61.9",

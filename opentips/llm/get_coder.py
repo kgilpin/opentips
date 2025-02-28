@@ -1,27 +1,36 @@
-from aider.coders import Coder
-from aider.models import Model
-from aider.io import InputOutput
+import importlib
+import sys
 
 from .llm_completion import get_model
 
 
-# For reference, see: https://github.com/Aider-AI/aider-swe-bench/blob/6e98cd6c3b2cbcba12976d6ae1b07f847480cb74/harness.py#L132
-# Apache License Version 2.0
-def get_coder(file_names, chat_history_file, temperature, *, dry_run=False) -> Coder:
+def get_coder(file_names, chat_history_file, temperature, *, dry_run=False):
     """
     Get an instance of aider to work with the given LLM `model` at `temperature`.
     Will store the markdown chat logs in
     the `chat_history_file`.
-    """
-    model = Model(get_model())
 
-    io = InputOutput(
+    Aider is loaded as a runtime dependency and not required in requirements.txt.
+    """
+    try:
+        # Dynamically import aider modules at runtime
+        aider_coders = importlib.import_module("aider.coders")
+        aider_models = importlib.import_module("aider.models")
+        aider_io = importlib.import_module("aider.io")
+    except ImportError:
+        raise ImportError(
+            "aider-chat is required for this operation, but it's not installed"
+        )
+
+    model = aider_models.Model(get_model())
+
+    io = aider_io.InputOutput(
         yes=True,  # Say yes to every suggestion aider makes
         chat_history_file=chat_history_file,  # Log the chat here
         input_history_file="/dev/null",  # Don't log the "user input"
     )
 
-    coder = Coder.create(
+    coder = aider_coders.Coder.create(
         main_model=model,
         io=io,
         map_tokens=2048,

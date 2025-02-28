@@ -1,6 +1,4 @@
-aider-chat~=0.75.1
 aiohttp~=3.11.11
-cx_Freeze~=7.2.9
 jsonrpcserver~=5.0.9
 litellm~=1.61.9
 colorama~=0.4.6

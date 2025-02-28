@@ -71,3 +71,7 @@ You can test the GitHub Actions workflows locally using [act](https://github.com
    ```
 
 Note: Windows builds cannot be tested locally due to runner limitations.
+
+## Optional Dependencies
+
+- To apply tips outside of the IDE environment: `aider-chat`
