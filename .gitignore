@@ -38,7 +38,6 @@ ENV/
 
 # Misc
 .DS_Store
-.navie
 
 # Aider
 chat_history.txt
