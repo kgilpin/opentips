@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v1.2.0 (2025-03-03)
+
+### Chores
+
+- Update gitignore
+  ([`d204049`](https://github.com/SgtAirRaid/opentips/commit/d2040497e00f00d8a27087edbbb8baad6a734700))
+
+### Features
+
+- Document RPC methods and remove unused methods
+  ([`a3a8477`](https://github.com/SgtAirRaid/opentips/commit/a3a8477ecb463cd5341b9c0b4350c64d512c77f3))
+
+
 ## v1.1.0 (2025-02-28)
 
 ### Bug Fixes
