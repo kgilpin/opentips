@@ -1,6 +1,7 @@
 ## RPC
 
-- [ ] Make aider a runtime dependency only.
+- [x] Document RPC methods and responses.
+- [x] Make aider a runtime dependency only.
 - [x] Package the opentips server as a standalone executable.
 - [x] Prioritize and prune the tips list after generating new tips, to keep the overall tips list manageable.
 - [x] When handling list_tips, check that all tips are valid before returning them.

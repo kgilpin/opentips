@@ -149,7 +149,6 @@ class RPCProvider(OpenTipsRPC):
         logger.info(
             "[rpc-provider] Files to be analyzed: %s", ", ".join(included_file_names)
         )
-        event_broadcaster.enqueue_event("changed", {"file_names": included_file_names})
         if immediate:
             asyncio.create_task(self.tip_request.process_tips())
         else:
@@ -158,8 +157,6 @@ class RPCProvider(OpenTipsRPC):
 
     async def suggest(self, new_only: Optional[bool]) -> TipList:
         """Get suggestions for changed files"""
-        event_broadcaster.enqueue_event("suggest", {})
-
         if new_only is None:
             new_only = True
         diff_chunks = diff(new_only=new_only)
@@ -191,11 +188,6 @@ class RPCProvider(OpenTipsRPC):
         Returns:
             TipList containing suggestions for the specified range
         """
-        event_broadcaster.enqueue_event(
-            "suggest_file_range",
-            {"file": file_name, "start": start_line, "end": end_line},
-        )
-
         tip_list = await fetch_tips_for_file_range(
             file_name=file_name, start_line=start_line, end_line=end_line
         )
