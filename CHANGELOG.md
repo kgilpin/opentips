@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v1.3.0 (2025-03-03)
+
+### Features
+
+- Use windows-friendly git commands
+  ([`0b4ccda`](https://github.com/SgtAirRaid/opentips/commit/0b4ccda0f175fe5dc9e5caf25670d2b332af60c0))
+
+
 ## v1.2.0 (2025-03-03)
 
 ### Chores
