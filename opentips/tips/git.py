@@ -14,6 +14,25 @@ logger = logging.getLogger(__name__)
 
 MAX_PATCH_CHANGES = 250
 
+GIT_COMMANDS = [
+    "git",
+    "git.exe",
+    "c:\\Program Files\\Git\\bin\\git.exe",
+]
+
+
+def detect_git_command() -> str:
+    """Detect the git command on the system"""
+    for command in GIT_COMMANDS:
+        logger.info(f"Checking for git command: {command}")
+        try:
+            subprocess.run([command, "--version"], stdout=subprocess.DEVNULL)
+            logger.info(f"Found git command: {command}")
+            return command
+        except FileNotFoundError:
+            pass
+    raise FileNotFoundError("Could not find git command on the system")
+
 
 class DiffChunk(NamedTuple):
     to_file: str
@@ -49,9 +68,10 @@ def git_diff(base_branch: str, ignore_list: set[str]) -> List[DiffChunk]:
 
     # List files that have a diff in the project so that we can exclude binary files.
     # We could consider using --name-status, but --name-only is sufficient for now.
+    git_command = detect_git_command()
     args = ["diff", "--diff-filter=ACM", "--name-only", base_branch] + exclude_paths
     try:
-        diff_files = execute("git", args, exitcode=1).strip()
+        diff_files = execute(git_command, args, exitcode=1).strip()
     except subprocess.CalledProcessError as e:
         logger.error(f"Error executing git diff: {e}")
         return []
@@ -69,7 +89,7 @@ def git_diff(base_branch: str, ignore_list: set[str]) -> List[DiffChunk]:
         base_branch,
     ] + exclude_paths
     try:
-        diff_output = execute("git", args, exitcode=1)
+        diff_output = execute(git_command, args, exitcode=1)
     except subprocess.CalledProcessError as e:
         logger.error(f"Error executing git diff: {e}")
         return []
@@ -95,7 +115,7 @@ def git_diff(base_branch: str, ignore_list: set[str]) -> List[DiffChunk]:
         )
 
     # Get untracked files
-    untracked_output = execute("git", ["status", "--porcelain"]).strip()
+    untracked_output = execute(git_command, ["status", "--porcelain"]).strip()
 
     # Filter out untracked files (lines starting with "??")
     untracked_files = (
@@ -141,8 +161,9 @@ def git_diff(base_branch: str, ignore_list: set[str]) -> List[DiffChunk]:
 
 
 def git_detect_branch_in_history(branches: List[str]) -> Optional[str]:
+    git_command = detect_git_command()
     try:
-        output = execute("git", ["branch", "--list", "--format=%(refname:short)"])
+        output = execute(git_command, ["branch", "--list", "--format=%(refname:short)"])
         named_branch_history = [line for line in output.splitlines() if line]
 
         for base_branch in branches:

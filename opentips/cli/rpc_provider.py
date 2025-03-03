@@ -3,7 +3,6 @@ import logging
 import os
 import subprocess
 from pathlib import Path
-import shlex
 from typing import Any, Dict, List, Optional
 
 from opentips.comm.message_completion import (
@@ -12,6 +11,7 @@ from opentips.comm.message_completion import (
 from opentips.tips.diff import diff
 from opentips.tips.invalidate_tips import invalidate_tips
 from opentips.tips.prune_tips import prune_tips
+from opentips.tips.git import detect_git_command
 
 from ..tips.explain_tip import explain_tip as explain_tip_fn
 from ..tips.fetch_tips import (
@@ -70,25 +70,19 @@ def filter_git_ignored(file_names: list[str]) -> list[str]:
         file_name for file_name in file_names if not includes_excluded_dir(file_name)
     ]
 
-    # Now we can check the git ignore status.
-    # The exit status of git check-ignore is as follows:
-    #
-    # 0 One or more of the provided paths is ignored.
-    # 1 None of the provided paths are ignored.
-    # 128 A fatal error was encountered.
+    git_command = detect_git_command()
     result = []
-    for batch in [file_names[i : i + 100] for i in range(0, len(file_names), 100)]:
-        escaped_file_names = [shlex.quote(file_name) for file_name in batch]
-        command = f"git check-ignore {' '.join(escaped_file_names)}"
-        process = subprocess.run(command, shell=True)
+    for file_names_batch in [
+        file_names[i : i + 100] for i in range(0, len(file_names), 100)
+    ]:
+        cmd_plus_args = [git_command, "check-ignore"] + file_names_batch
+        process = subprocess.run(cmd_plus_args)
         if process.returncode == 0:
             logger.debug(f"[rpc-provider] Some of the files are ignored")
             # Some files are ignored, check them individually
-            for file_name in batch:
-                individual_process = subprocess.run(
-                    f"git check-ignore {shlex.quote(file_name)}",
-                    shell=True,
-                )
+            for file_name in file_names_batch:
+                cmd_plus_args = [git_command, "check-ignore", file_name]
+                individual_process = subprocess.run(cmd_plus_args)
                 if individual_process.returncode == 1:
                     # The file is not ignored
                     logger.debug(f"[rpc-provider] File {file_name} is not ignored")
@@ -103,12 +97,12 @@ def filter_git_ignored(file_names: list[str]) -> list[str]:
         elif process.returncode == 1:
             # None of the files are ignored
             logger.debug(f"[rpc-provider] None of the files are ignored")
-            result.extend(batch)
+            result.extend(file_names_batch)
         else:
             logger.error(
                 f"[rpc-provider] Error running git check-ignore: {process.stderr}"
             )
-            result.extend(batch)
+            result.extend(file_names_batch)
 
     return result
 

@@ -14,9 +14,13 @@
 
 ## VSCode
 
-- [ ] Remove language model info from the "service" walkthrough
-- [ ] When the user manually refreshes the tips, show a progress indicator message or in the status bar.
+- [ ] Command to check system status
+- [ ] Figure out how to embed action / command links in the walkthrough pages
 - [ ] Provide status bar feedback when the server is running.
+- [ ] When the user manually refreshes the tips, show a progress indicator message or in the status bar.
+- [ ] Provide more images and Gifs in the listing page
+- [x] Provide the Marketplace listing page.
+- [x] Remove language model info from the "service" walkthrough
 - [x] Rely on the server to filter tips for code applicability.
 - [x] Apply a Decoration to the lines that are changed by the "Apply" feature.
 - [x] Clean up the encoding / decoding of tip ids and remove when possible.
@@ -25,6 +29,13 @@
       present, hide or even dismiss the tip.
 - [x] Show the number of available tips in the Activity bar (and in the status bar?). This will give the user a sense of how many
       tips are available, and give them a way to navigate to the tip list.
+
+## Windows
+
+[khhoah] Executing command: cmd.exe /c "c:\Users\kgilpin\.vscode\extensions\opentips.opentips-1.0.0\scripts\install_win.bat"
+[khhoah] spawn C:\WINDOWS\system32\cmd.exe ENOENT
+
+Ignore .venv and venv in the file watcher by default
 
 ## Code signing
 
