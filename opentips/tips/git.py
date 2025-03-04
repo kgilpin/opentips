@@ -24,10 +24,10 @@ GIT_COMMANDS = [
 def detect_git_command() -> str:
     """Detect the git command on the system"""
     for command in GIT_COMMANDS:
-        logger.info(f"Checking for git command: {command}")
+        logger.debug(f"Checking for git command: {command}")
         try:
             subprocess.run([command, "--version"], stdout=subprocess.DEVNULL)
-            logger.info(f"Found git command: {command}")
+            logger.debug(f"Found git command: {command}")
             return command
         except FileNotFoundError:
             pass
