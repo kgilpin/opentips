@@ -2,7 +2,7 @@ name: Build, test and package
 
 on:
   push:
-    branches: [main, feat/windows-package]
+    branches: [main]
 
 permissions:
   contents: write
