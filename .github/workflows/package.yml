@@ -2,14 +2,13 @@ name: Build, test and package
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/windows-package]
 
 permissions:
   contents: write
 
 jobs:
   build:
-    if: github.ref == 'refs/heads/main'
     strategy:
       fail-fast: false
       matrix:
@@ -34,11 +33,12 @@ jobs:
         run: |
           python -m pytest test/
 
-      # - name: Build executable
-      #   run: |
-      #     pip install ".[exe]"
-      #     python setup.py build
-
+      - name: Build Windows executable
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./scripts/build_exe.ps1
+          
       # - name: Sign Windows Build
       #   if: runner.os == 'Windows'
       #   shell: pwsh
@@ -59,11 +59,12 @@ jobs:
       #     chmod +x ./scripts/sign-macos.sh
       #     ./scripts/sign-macos.sh
 
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: opentips-${{ runner.os }}
-      #     path: build/exe.*/**/*
+      - name: Upload artifact
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: opentips-${{ runner.os }}
+          path: build/exe.*/**
 
   release:
     needs: build
