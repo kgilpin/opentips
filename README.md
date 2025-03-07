@@ -28,11 +28,80 @@ This command starts the OpenTips server on port 5000, serving tips for the proje
 python -m opentips.cli.client -p 5000 suggest
 ```
 
+# Examples
+
+
+## Tracking code changes and computing tip suggestions
+
+```mermaid
+sequenceDiagram
+    participant IDE as IDE Plugin (Client)
+    participant Server as OpenTips Server
+    participant LLM as LLM Service
+
+    Note over IDE: User edits code
+
+    IDE->>Server: changed(file_names)
+    Server-->>IDE: {filtered_file_names}
+    Note over Server: Debounce changes and filter git-ignored files
+
+    loop Every polling interval
+        IDE->>Server: poll_events()
+        Server-->>IDE: []
+    end
+
+    Note over Server: After debounce period
+    Server->>Server: Schedule tip generation
+
+    loop Next polling interval
+        IDE->>Server: poll_events()
+        Server-->>IDE: [{event: "complete", payload: {...}}]
+        Note over IDE: Process LLM request
+        IDE->>LLM: Send prompt with code context
+        LLM-->>IDE: Generated tips
+        IDE->>Server: complete_response(request_id, response)
+        Server->>Server: Process tips
+    end
+
+    loop Next polling interval
+        IDE->>Server: poll_events()
+        Server-->>IDE: [{event: "tips", payload: {tips: [...]}}]
+        Note over IDE: Display tips to user
+    end
+```
+
+1. **Change Detection**:
+   - The user modifies code in the IDE
+   - The IDE plugin detects these changes and calls the `changed` method with the list of modified files
+   - The server filters out git-ignored files and returns the filtered list
+
+2. **Event Polling**:
+   - The IDE plugin continuously polls for events using `poll_events()`
+   - Initially, no events are returned while the server debounces changes
+
+3. **LLM Request Generation**:
+   - After the debounce period, the server schedules tip generation
+   - When ready, the server emits a `complete` event
+   - During the next polling interval, the IDE plugin receives this event
+
+4. **LLM Processing**:
+   - The IDE plugin processes the LLM request:
+     - Extracts the prompt and context from the event payload
+     - Sends this to an LLM service
+     - Returns the generated tips using `complete_response()`
+   - The server processes these tips
+
+5. **Tip Delivery**:
+   - In the next polling cycle, the server emits a tips event
+   - The IDE plugin receives this event and displays the tips to the user
+
+
 # RPC Reference
 
 - [Methods](#methods)
   - [`changed`](#changed-method)
   - [`poll_events`](#poll_events-method)
+  - [`complete_response`](#complete_response-method)
   - [`suggest`](#suggest-method)
   - [`suggest_file_range`](#suggest_file_range-method)
   - [`list_tips`](#list_tips-method)
@@ -145,6 +214,64 @@ See the [Events](#events) section for a list of possible event types.
 ]
 ```
 
+<a id="complete_response-method"><h2><code>complete_response</code></h2></a>
+
+The `complete_response` method allows clients to provide the results of an LLM completion request back to the server.
+
+## Request Parameters
+
+- `request_id` (required): String containing the unique identifier of the completion request
+- `response` (required): String or structured object containing the LLM's response
+
+## Response
+
+A detailed response is not required; typically just `null` or `true` to indicate the response was received.
+
+## Description
+
+This RPC method is the counterpart to the `complete` event. When a client receives a `complete` event, it should process the LLM request and then call this method to provide the result back to the server.
+
+The `response` parameter can be either a string (for unstructured text responses) or a structured object that conforms to the JSON schema provided in the original `complete` event's `response_format` field.
+
+After calling this method, the server will continue processing the operation that required the LLM completion.
+
+## Example Usage
+
+```json
+// Request
+{
+  "method": "complete_response",
+  "params": {
+    "request_id": "550e8400-e29b-41d4-a716-446655440000",
+    "response": "The factorial of a number can be calculated recursively by multiplying the number by the factorial of (number - 1). The base case is that factorial(0) = 1."
+  }
+}
+
+// Response
+true
+```
+
+Or with a structured response:
+
+```json
+// Request
+{
+  "method": "complete_response",
+  "params": {
+    "request_id": "550e8400-e29b-41d4-a716-446655440000",
+    "response": {
+      "tips": [
+        {
+          "type": "performance",
+          "label": "Use memoization",
+          "description": "Cache results of expensive function calls"
+        }
+      ]
+    }
+  }
+}
+```
+
 <a id="suggest-method"><h2><code>suggest</code></h2></a>
 
 The `suggest` method retrieves programming tips for code changes in the code diff. This command can be used to
@@ -198,7 +325,7 @@ The `new_only` parameter allows filtering the diff to focus only on newly added 
    }
   ]
 }
-```
+````
 
 <a id="suggest_file_range-method"><h2><code>suggest_file_range</code></h2></a>
 
@@ -587,6 +714,53 @@ This event is emitted in several scenarios:
 4. When a tip is pruned to maintain the configured maximum number of tips
 
 Client applications should listen for this event to remove tips from the UI that are no longer valid.
+
+<a id="complete-event"><h2><code>complete</code></h2></a>
+
+The `complete` event is broadcast when the server needs to obtain a completion from an LLM. The client handles this event to generate content using an LLM service of its choosing, responding with `complete_response`.
+
+## Event Structure
+
+```json
+{
+  "event": "complete",
+  "payload": {
+    "request_id": "unique-uuid-string",
+    "directory": "/path/to/working/directory",
+    "prompt": "System prompt for the LLM",
+    "user_message": "User message to send to the LLM",
+    "temperature": 0.7,
+    "response_format": {
+      // Optional JSON schema describing the expected response format
+    }
+  }
+}
+```
+
+## Payload Properties
+
+- `request_id`: A unique identifier for this completion request
+- `directory`: The current working directory
+- `prompt`: The system prompt for the LLM
+- `user_message`: The user message to send to the LLM
+- `temperature`: The temperature setting for LLM generation
+- `response_format` (optional): JSON schema describing the expected response format
+
+## Response Mechanism
+
+Unlike other events, the `complete` event expects a response from the client. The client should:
+
+1. Detect the `complete` event via polling
+2. Extract the completion request parameters
+3. Send the request to an LLM service
+4. Return the response using the `complete_response` RPC method
+
+## When It's Emitted
+
+This event is emitted whenever the server needs to generate content using an LLM, such as:
+
+1. When generating tips for code changes
+2. When explaining existing tips
 
 # Tip Alignment and Validation
 

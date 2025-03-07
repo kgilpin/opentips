@@ -1,5 +1,6 @@
 ## RPC
 
+- [x] Document the 'complete' event and 'complete_response' RPC method
 - [x] Document RPC methods and responses.
 - [x] Make aider a runtime dependency only.
 - [x] Package the opentips server as a standalone executable.
@@ -14,11 +15,18 @@
 
 ## VSCode
 
-- [ ] Command to check system status
-- [ ] Figure out how to embed action / command links in the walkthrough pages
+- [ ] When the user manually refreshes the tips, show a progress indicator message.
+- [ ] Command to check system status (run after opentips.service.python.installDependencies).
 - [ ] Provide status bar feedback when the server is running.
-- [ ] When the user manually refreshes the tips, show a progress indicator message or in the status bar.
-- [ ] Provide more images and Gifs in the listing page
+  - [ ] Status bar should go RED if the service cannot be run after a few retries.
+  - [ ] Open the OpenTips output channel when the user clicks on the status bar.
+- [ ] Figure out how to embed commands as Buttons in the walkthrough pages.
+- [ ] Provide more images and Gifs in the listing page.
+- [ ] Deprecate this by installing Python automatically:
+  > Once you've selected the Python interpreter, run the command Python: Create Terminal from the Command Palette (Ctrl+Shift+P) or (Cmd+Shift+P) to open a terminal with the selected Python interpreter:
+- [ ] Show Markdown Preview of each tip rather than a text document?
+- [x] Update help to include a link to open the Output channel
+  > [Open Output Channel](command:workbench.action.output.toggleOutput)
 - [x] Provide the Marketplace listing page.
 - [x] Remove language model info from the "service" walkthrough
 - [x] Rely on the server to filter tips for code applicability.
