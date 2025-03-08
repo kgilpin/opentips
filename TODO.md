@@ -25,6 +25,8 @@
 - [ ] Deprecate this by installing Python automatically:
   > Once you've selected the Python interpreter, run the command Python: Create Terminal from the Command Palette (Ctrl+Shift+P) or (Cmd+Shift+P) to open a terminal with the selected Python interpreter:
 - [ ] Show Markdown Preview of each tip rather than a text document?
+- [x] Show status webview in the sidebar panel.
+- [x] Show a gear icon in the Panel to open the settings.
 - [x] Update help to include a link to open the Output channel
   > [Open Output Channel](command:workbench.action.output.toggleOutput)
 - [x] Provide the Marketplace listing page.
