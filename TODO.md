@@ -1,5 +1,8 @@
 ## RPC
 
+- [ ] Use dash-case for tips
+- [ ] Normalize across tips to eliminate duplicates
+- [ ] Expose a list of common tip types
 - [x] Document the 'complete' event and 'complete_response' RPC method
 - [x] Document RPC methods and responses.
 - [x] Make aider a runtime dependency only.
