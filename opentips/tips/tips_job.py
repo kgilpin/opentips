@@ -37,9 +37,11 @@ class TipsJob:
 
                 return await self.process_tips()
             except asyncio.CancelledError:
-                logger.info("Tip request was canceled")
+                logger.info("[tips-job] Tip request was canceled")
             except Exception as e:
-                logger.error(f"An error occurred in delayed_tip: {e}", exc_info=True)
+                logger.error(
+                    f"[tips-job] An error occurred in delayed_tip: {e}", exc_info=True
+                )
 
         self._current_task = asyncio.create_task(delayed_tip())
         return self._current_task
@@ -49,22 +51,20 @@ class TipsJob:
         diff_chunks = diff(new_only=True)
         # Return early if diff_chunks is None or, more likely, an empty list
         if not diff_chunks:
-            logger.debug("No diff content to analyze")
+            logger.debug("[tips-job] No diff content to analyze")
             return TipList(tips=[])
 
         changed_files = {chunk.to_file for chunk in diff_chunks}
         invalidate_tips(list_tips(), changed_files=changed_files)
 
         tip_list = await fetch_tips_for_diff(diff_chunks)
-
         tips = invalidate_tips(tip_list.tips)
         tips = await prune_tips(tips, self._tips_limit)
-
         tip_list.tips = tips
 
-        logger.info("Tips:")
+        logger.info("[tips-job] Tips:")
         for tip in tip_list.tips:
-            logger.info(str(tip))
+            logger.info(f"[tips-job] {str(tip)}")
 
         event_broadcaster.enqueue_event("tips", tip_list.model_dump())
 
