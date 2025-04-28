@@ -1,8 +1,9 @@
 ## RPC
 
-- [ ] Use dash-case for tips
+- [ ] Implement "severity" handling in the IDE extension.
 - [ ] Normalize across tips to eliminate duplicates
 - [ ] Expose a list of common tip types
+- [x] Use dash-case for tips
 - [x] Document the 'complete' event and 'complete_response' RPC method
 - [x] Document RPC methods and responses.
 - [x] Make aider a runtime dependency only.
@@ -18,6 +19,7 @@
 
 ## VSCode
 
+- [ ] Don't run tip server when a fixed port is configured.
 - [ ] When the user manually refreshes the tips, show a progress indicator message.
 - [ ] Command to check system status (run after opentips.service.python.installDependencies).
 - [ ] Provide status bar feedback when the server is running.

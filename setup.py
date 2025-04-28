@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 
 setup(
     name="opentips",
     version=__version__,
-    author="sargeairraid@gmail.com",
+    author="kgilpin@gmail.com",
     description="Automated assistant that provides coding tips as you work",
     packages=find_packages(),
     install_requires=[

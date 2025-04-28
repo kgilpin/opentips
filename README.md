@@ -2,7 +2,7 @@
 
 OpenTips provides coding tips and suggestions in your code editor. It's like having a helpful colleague who points out potential improvements and best practices as you write code.
 
-Tips are based primarily on the current Git diff of the project, and they cover a wide range of topics, including code style, performance optimizations, refactoring suggestions, and more.
+Tips are based primarily on the current Git diff of the project. Suggestions focus primarily on potential bugs, security flaws, and performance problems.
 
 ## Usage in an IDE Plugin Environment
 
@@ -12,7 +12,7 @@ In this type of environment, the IDE plugin runs the server with `-p 0`, which a
 
 ## See Also
 
-- [OpenTips VSCode Extension](https://github.com/SgtAirRaid/opentips-vscode): A Visual Studio Code extension that integrates OpenTips into the IDE.
+- [OpenTips VSCode Extension](https://github.com/kgilpin/opentips-vscode): A Visual Studio Code extension that integrates OpenTips into the IDE.
 
 ## Running the Server and Client Manually
 
@@ -29,7 +29,6 @@ python -m opentips.cli.client -p 5000 suggest
 ```
 
 # Examples
-
 
 ## Tracking code changes and computing tip suggestions
 
@@ -71,20 +70,24 @@ sequenceDiagram
 ```
 
 1. **Change Detection**:
+
    - The user modifies code in the IDE
    - The IDE plugin detects these changes and calls the `changed` method with the list of modified files
    - The server filters out git-ignored files and returns the filtered list
 
 2. **Event Polling**:
+
    - The IDE plugin continuously polls for events using `poll_events()`
    - Initially, no events are returned while the server debounces changes
 
 3. **LLM Request Generation**:
+
    - After the debounce period, the server schedules tip generation
    - When ready, the server emits a `complete` event
    - During the next polling interval, the IDE plugin receives this event
 
 4. **LLM Processing**:
+
    - The IDE plugin processes the LLM request:
      - Extracts the prompt and context from the event payload
      - Sends this to an LLM service
@@ -94,7 +97,6 @@ sequenceDiagram
 5. **Tip Delivery**:
    - In the next polling cycle, the server emits a tips event
    - The IDE plugin receives this event and displays the tips to the user
-
 
 # RPC Reference
 
@@ -325,7 +327,7 @@ The `new_only` parameter allows filtering the diff to focus only on newly added 
    }
   ]
 }
-````
+```
 
 <a id="suggest_file_range-method"><h2><code>suggest_file_range</code></h2></a>
 
