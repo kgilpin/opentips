@@ -51,22 +51,33 @@ async def llm_tips(
         raise ValueError("No diff or file chunk provided to llm_tips")
 
     base_instructions = f"""You are a helpful programming assistant. Please analyze this git diff and suggest 1-3 specific, actionable changes
-that would make the code better. 
+that would make the code better.
 
-Don't nit-pick style or formatting issues, or ask the user to add cases or complexity to handle situations that
-aren't acutally observed in the code.
+Your suggestions should focus on the following areas:
 
-Don't suggest tips that have already been considered by the developer and are explained in the comments.
+1) Potential bugs or errors in the code.
+2) Security vulnerabilities.
+3) Performance improvements.
+
+Other types suggestions, such as:
+
+* Code style
+* Refactoring
+* Documentation
+* Testing
+* Extensive error handling
+* Code organization
+* Code formatting
+* Code readability
+* Code complexity
+
+are generally _not_ desirable. However, in the rare case that this type of suggestion can make a large improvement to the code, you may include it.
+
+Don't suggest changes that have already been considered by the developer and are explained in the comments.
 
 Respect implementation decisions that are explained in comments, including both current choices and future plans that are explicitly deferred.
 
 Don't suggest switching the implementation of some code back to the way that it previously was.
-
-Don't emit the following types of suggestions:
-
-<|notips|>
-Changes to the number of newlines or whitespace lines
-<|end-notips|>
 """
 
     diff_instructions = None
@@ -99,11 +110,14 @@ Changes to the number of newlines or whitespace lines
 
 file: the path to the file from the project root.
 line: line number in the file where the tip applies.
-type: the type of code improvement that the tip suggests.
+type: the type of code improvement that the tip suggests. Primary tip types are: bug, security, performance.
+    When generating multi-word tip types, use hyphens to separate words. For example: "code-style" or "error-handling".
 context: a snippet of code that provides the context for the tip. It should exactly match the code in the file
     that the user is working on.
-complexity: one of "low", "medium", or "high". It advises the programmer about 
-    how much expertise is required to understand and apply the tip.
+complexity: a measure of how complex the code is, in terms of cyclomatic complexity. It should be one of "low", "medium", or "high".
+severity: one of "low", "medium", or "high". It advises the programmer about 
+    how important it is to address the tip. For example, a definite security vulnerability would be "high", while 
+    a possible bug that is only a concern in some cases would be "low".
 label: a few words that concicely describe the tip.
 description: a sentence that explain the tip and how it would make an improvement to the code.
 """

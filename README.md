@@ -1,8 +1,8 @@
 # OpenTips
 
-OpenTips provides coding tips and suggestions in your code editor. It's like having a helpful colleague who points out potential improvements and best practices as you write code.
+OpenTips provides realtime code review from within your code editor. It's like having a helpful colleague who points out potential improvements and best practices as you write code.
 
-Tips are based primarily on the current Git diff of the project. Suggestions focus primarily on potential bugs, security flaws, and performance problems.
+Suggestions are based primarily on the current Git diff of the project, and focus primarily on potential bugs, security flaws, and performance problems.
 
 ## Usage in an IDE Plugin Environment
 
@@ -22,7 +22,7 @@ For development purposes, you can run the OpenTips server and client manually wi
 ANTHROPIC_API_KEY=your_api_key python -m opentips.cli.main -p 5000 -d ../myproject
 ```
 
-This command starts the OpenTips server on port 5000, serving tips for the project located in the `../myproject` directory. You can then connect to the server using the OpenTips client program:
+This command starts the OpenTips server on port 5000, serving suggestions for the project located in the `../myproject` directory. You can then connect to the server using the OpenTips client program:
 
 ```bash
 python -m opentips.cli.client -p 5000 suggest

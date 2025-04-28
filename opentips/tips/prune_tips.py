@@ -43,9 +43,15 @@ async def prune_tips(tips: List[Tip], tips_limit: int) -> List[Tip]:
     if len(tips) <= tips_limit:
         return tips
 
+    logger.info(
+        f"[prune-tips] Pruning tips to maintain a limit of {tips_limit} tips. Current count: {len(tips)}"
+    )
+
     selected_tips = await llm_prune_tips(tips, tips_limit)
     # Array sizes are small and tips are not hashable, so we stick with a list
     tips_to_remove = [tip for tip in tips if tip not in selected_tips]
+
+    logger.info(f"[prune-tips] Removing {len(tips_to_remove)} tips")
 
     for tip in tips_to_remove:
         tip_operation(
