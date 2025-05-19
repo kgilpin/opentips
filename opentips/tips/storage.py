@@ -64,7 +64,7 @@ def build_tip_digest(tip: Tip) -> str:
     return base64.urlsafe_b64encode(hash_bytes).rstrip(b"=").decode("ascii")
 
 
-def build_tip_external_id(tip_id: str, directory: str) -> str:
+def build_tip_external_id(tip_id: str, directory: str, version="1.1") -> str:
     """Build an external ID for a tip.
 
     Args:
@@ -75,32 +75,32 @@ def build_tip_external_id(tip_id: str, directory: str) -> str:
         str: The external ID for the tip
     """
     id_parts = (
-        "1.0".encode("utf-8"),
+        version.encode("utf-8"),
         directory.encode("utf-8"),
         tip_id.encode("utf-8"),
     )
     return base64.urlsafe_b64encode(b"\n".join(id_parts)).rstrip(b"=").decode("ascii")
 
 
-def parse_tip_external_id(external_id: str) -> tuple[str, str]:
+def parse_tip_external_id(external_id: str) -> tuple[str, str, str]:
     """Parse an external ID into its constituent parts.
 
     Args:
         external_id: The external ID to parse
 
     Returns:
-        tuple[str, str]: The directory and internal ID of the tip
+        tuple[str, str, str]: A tuple of (version, directory, tip_id)
     """
     decoded_id = base64.urlsafe_b64decode(external_id + "===").decode("utf-8")
     tokens = decoded_id.split("\n")
     version = tokens[0]
-    if version != "1.0":
-        raise ValueError(f"Invalid tip ID format: {tokens[0]}")
+    if version not in ("1.0", "1.1"):
+        raise ValueError(f"Invalid tip ID format: {version}")
 
     if len(tokens) != 3:
         raise ValueError(f"Invalid tip ID: {external_id}")
 
-    return tokens[1], tokens[2]
+    return version, tokens[1], tokens[2]
 
 
 def is_diff_chunk_new(diff_chunk: DiffChunk) -> bool:
@@ -127,7 +127,7 @@ def is_diff_chunk_new(diff_chunk: DiffChunk) -> bool:
     return True
 
 
-def save_tip_if_new(tip: Tip) -> bool:
+def save_tip_if_new(tip: Tip, tip_id: Optional[str] = None) -> bool:
     """Save a tip to storage if it doesn't already exist.
 
     A tip is considered new if there is no tip with the same ID in the same directory.
@@ -157,7 +157,10 @@ def save_tip_if_new(tip: Tip) -> bool:
     if tip_path.exists():
         return False
 
-    tip.id = build_tip_external_id(tip_digest, tip.directory)
+    if not tip_id:
+        tip_id = build_tip_external_id(tip_digest, tip.directory)
+
+    tip.id = tip_id
     try:
         tip_path.write_text(json.dumps(tip.model_dump(), indent=2))
     except (IOError, PermissionError) as e:
@@ -220,6 +223,9 @@ def list_tips(
         try:
             with open(tip_path, "r") as f:
                 tip_data = json.load(f)
+                # Provide missing "priority" field to migrate older data
+                if "priority" not in tip_data:
+                    tip_data["priority"] = "medium"
                 tip = Tip.model_validate(tip_data)
                 if not tip.deleted or include_deleted:
                     return tip
@@ -252,7 +258,7 @@ def load_tip(tip_id: str, *, include_deleted: bool = False) -> Tip:
     """
     storage_dir = get_storage_dir("tips")
 
-    _, tip_digest = parse_tip_external_id(tip_id)
+    version, _, tip_digest = parse_tip_external_id(tip_id)
     tip_path = next(storage_dir.glob(f"*/{tip_digest}.json"), None)
 
     if tip_path is None:
@@ -261,6 +267,7 @@ def load_tip(tip_id: str, *, include_deleted: bool = False) -> Tip:
     try:
         with open(tip_path, "r") as f:
             tip_data = json.load(f)
+            tip_data = migrate_tip_data(version, tip_data)
             tip = Tip.model_validate(tip_data)
             if not tip.deleted or include_deleted:
                 return tip
@@ -280,7 +287,7 @@ def delete_tip(tip_id: str) -> bool:
         bool: True if the tip was deleted, False if the tip was not found
     """
     storage_dir = get_storage_dir("tips")
-    _, tip_digest = parse_tip_external_id(tip_id)
+    _, _, tip_digest = parse_tip_external_id(tip_id)
     tip_path = next(storage_dir.glob(f"*/{tip_digest}.json"), None)
 
     if tip_path is None:
@@ -304,3 +311,18 @@ def delete_tip(tip_id: str) -> bool:
         return False
 
     return True
+
+
+def migrate_tip_data(version: str, tip_data: dict) -> dict:
+    """Migrate tip data to the latest version.
+
+    Args:
+        version: The version of the tip data format
+        tip_data: The tip data to migrate
+
+    Returns:
+        dict: The migrated tip data
+    """
+    if version == "1.0" and "priority" not in tip_data:
+        tip_data["priority"] = "medium"
+    return tip_data

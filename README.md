@@ -811,6 +811,7 @@ _then_ be used to determine which RPC process to invoke for further information 
   "line": 45,
   "context": "for i in range(len(items)):\n    result.append(items[i] * 2)",
   "type": "style",
+  "priority": "medium",
   "complexity": "low",
   "label": "Use list comprehension",
   "description": "Replace the for-loop with a more concise list comprehension"

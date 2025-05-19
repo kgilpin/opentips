@@ -1,6 +1,5 @@
 ## RPC
 
-- [ ] Implement "severity" handling in the IDE extension.
 - [ ] Normalize across tips to eliminate duplicates
 - [ ] Don't re-analyze unchanged chunks of code
 - [x] Implement "priority" handling in the IDE extension.
@@ -20,6 +19,7 @@
 
 ## VSCode
 
+- [ ] Auto-update the opentips package when a new version is available.
 - [ ] (bug) "OpenTips - Open Service Installation Walkthrough" opens the generic list of VSCode walkthroughs.
 - [ ] When the user manually refreshes the tips, show a progress indicator message.
 - [ ] Figure out how to embed commands as Buttons in the walkthrough pages.
