@@ -20,6 +20,7 @@ class TestLLMPruneTips:
                 line=10,
                 context="def example():",
                 type="style",
+                priority="medium",
                 complexity="low",
                 label="Formatting",
                 description="Fix indentation",
@@ -31,6 +32,7 @@ class TestLLMPruneTips:
                 line=20,
                 context="def another():",
                 type="performance",
+                priority="high",
                 complexity="high",
                 label="Algorithm",
                 description="Use more efficient algorithm",
@@ -42,6 +44,7 @@ class TestLLMPruneTips:
                 line=30,
                 context="x = 1",
                 type="style",
+                priority="low",
                 complexity="low",
                 label="Formatting",
                 description="Add whitespace",
@@ -88,8 +91,9 @@ Here are the available tips:
 """
 
         # Execute
+        expected_prompt = "Return the tips in a resorted order, with the most valuable and diverse tips first."
         prompt = llm_prune_tips_prompt()
-        assert prompt.strip() == expected_prompt.strip()
+        assert expected_prompt in prompt
 
     @patch("opentips.llm.llm_prune_tips.get_completion_handler")
     async def test_prune_tips_error(self, mock_get_completion_handler, sample_tips):

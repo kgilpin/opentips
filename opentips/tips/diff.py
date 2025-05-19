@@ -12,7 +12,6 @@ BASE_BRANCHES = [
 IGNORE_LIST = {
     "node_modules",
     "vendor",
-    "venv",
     "dist",
     "build",
     "target",

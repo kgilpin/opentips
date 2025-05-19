@@ -1,8 +1,8 @@
 ## RPC
 
-- [ ] Implement "severity" handling in the IDE extension.
 - [ ] Normalize across tips to eliminate duplicates
-- [ ] Expose a list of common tip types
+- [ ] Don't re-analyze unchanged chunks of code
+- [x] Implement "priority" handling in the IDE extension.
 - [x] Use dash-case for tips
 - [x] Document the 'complete' event and 'complete_response' RPC method
 - [x] Document RPC methods and responses.
@@ -19,17 +19,30 @@
 
 ## VSCode
 
-- [ ] Don't run tip server when a fixed port is configured.
+- [ ] Auto-update the opentips package when a new version is available.
+- [ ] (bug) "OpenTips - Open Service Installation Walkthrough" opens the generic list of VSCode walkthroughs.
 - [ ] When the user manually refreshes the tips, show a progress indicator message.
-- [ ] Command to check system status (run after opentips.service.python.installDependencies).
-- [ ] Provide status bar feedback when the server is running.
-  - [ ] Status bar should go RED if the service cannot be run after a few retries.
-  - [ ] Open the OpenTips output channel when the user clicks on the status bar.
 - [ ] Figure out how to embed commands as Buttons in the walkthrough pages.
-- [ ] Provide more images and Gifs in the listing page.
 - [ ] Deprecate this by installing Python automatically:
   > Once you've selected the Python interpreter, run the command Python: Create Terminal from the Command Palette (Ctrl+Shift+P) or (Cmd+Shift+P) to open a terminal with the selected Python interpreter:
 - [ ] Show Markdown Preview of each tip rather than a text document?
+- [ ] Backend accepts delete_after_apply parameter in apply_tip. Frontend doesn't pass this parameter.
+- [ ] Add event types. Example:
+
+```typescript
+interface TipDeletedEvent {
+  type: "tip_deleted";
+  data: {
+    tip_id: string;
+    reason: string;
+  };
+}
+```
+
+- [x] Update the tip list image on the marketplace page
+- [x] Provide status feedback on the service operational status
+- [x] Implement the priority field
+- [x] Don't run tip server when a fixed port is configured.
 - [x] Show status webview in the sidebar panel.
 - [x] Show a gear icon in the Panel to open the settings.
 - [x] Update help to include a link to open the Output channel

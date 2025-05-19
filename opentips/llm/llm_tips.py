@@ -21,6 +21,7 @@ class LLMTip(BaseModel):
     complexity: str
     label: str
     description: str
+    priority: str
 
 
 class LLMTipList(BaseModel):
@@ -50,7 +51,7 @@ async def llm_tips(
     if not diff_chunks and not file_chunk:
         raise ValueError("No diff or file chunk provided to llm_tips")
 
-    base_instructions = f"""You are a helpful programming assistant. Please analyze this git diff and suggest 1-3 specific, actionable changes
+    base_instructions = f"""You are a helpful programming assistant. Analyze this git diff and suggest specific, actionable changes
 that would make the code better.
 
 Your suggestions should focus on the following areas:
@@ -59,23 +60,22 @@ Your suggestions should focus on the following areas:
 2) Security vulnerabilities.
 3) Performance improvements.
 
-Other types suggestions, such as:
+Other types of suggestions, such as:
 
 * Code style
 * Refactoring
 * Documentation
 * Testing
-* Extensive error handling
+* Adjustments to error handling that are not bug fixes
 * Code organization
 * Code formatting
 * Code readability
 * Code complexity
 
-are generally _not_ desirable. However, in the rare case that this type of suggestion can make a large improvement to the code, you may include it.
+may be included, if the code is free of bugs, security issues, and performance problems.
 
-Don't suggest changes that have already been considered by the developer and are explained in the comments.
-
-Respect implementation decisions that are explained in comments, including both current choices and future plans that are explicitly deferred.
+The code might contain an explanation of why the code is written in a certain way. If the code is deliberately
+written in a way that contradicts a sugestion you might make, please respect the developer's decision and do not suggest a change.
 
 Don't suggest switching the implementation of some code back to the way that it previously was.
 """
@@ -112,14 +112,12 @@ file: the path to the file from the project root.
 line: line number in the file where the tip applies.
 type: the type of code improvement that the tip suggests. Primary tip types are: bug, security, performance.
     When generating multi-word tip types, use hyphens to separate words. For example: "code-style" or "error-handling".
+label: a few words that concisely describe the tip.
+description: a sentence that explain the tip and how it would make an improvement to the code.
+priority: a measure of how important the tip is to address. It should be one of "low", "medium", or "high".
+complexity: a measure of how complex the suggestion is, in terms of cyclomatic complexity to implement. It should be one of "low", "medium", or "high".
 context: a snippet of code that provides the context for the tip. It should exactly match the code in the file
     that the user is working on.
-complexity: a measure of how complex the code is, in terms of cyclomatic complexity. It should be one of "low", "medium", or "high".
-severity: one of "low", "medium", or "high". It advises the programmer about 
-    how important it is to address the tip. For example, a definite security vulnerability would be "high", while 
-    a possible bug that is only a concern in some cases would be "low".
-label: a few words that concicely describe the tip.
-description: a sentence that explain the tip and how it would make an improvement to the code.
 """
 
     prompt = (

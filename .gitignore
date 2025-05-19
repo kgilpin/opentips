@@ -38,9 +38,11 @@ ENV/
 
 # Misc
 .DS_Store
+tmp/appmap
+appmap.log
 
 # Aider
 chat_history.txt
 cache.db*
- 
 .aider*
+

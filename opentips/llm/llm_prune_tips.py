@@ -32,14 +32,13 @@ def llm_prune_tips_prompt() -> str:
 
 Return the tips in a resorted order, with the most valuable and diverse tips first.
 
-Prioritize those that are:
+Prioritize those that:
 
-1. Most actionable and valuable for improving the code
+1. Are most important for improving the code
 2. Represent a diverse set of improvement types
-3. Cover different complexity levels
-4. Avoid redundant or very similar suggestions
+3. Avoid redundant / similar suggestions
 
-When there are similar or redundant suggestions, always choose just one to retain.
+When there are redundant / similar suggestions for the same code context, always choose just one to retain.
 
 Respond with a list of tip IDs to retain, in JSON format like this:
 {{"retained_tips": ["tip-id-1", "tip-id-2", ...]}}

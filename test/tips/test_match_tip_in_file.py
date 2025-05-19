@@ -30,6 +30,7 @@ class TestMatchTipInFile:
             line=2,
             context="# This is a comment",
             type="style",
+            priority="low",
             complexity="low",
             label="Comment",
             description="This is a test comment",
@@ -44,6 +45,7 @@ class TestMatchTipInFile:
             line=1,  # Original line is actually 6
             context="x = 42",
             type="style",
+            priority="low",
             complexity="low",
             label="Variable",
             description="This is a test variable",
@@ -58,6 +60,7 @@ class TestMatchTipInFile:
             line=1,
             context="this line does not exist",
             type="style",
+            priority="low",
             complexity="low",
             label="NonExistent",
             description="This should not match",

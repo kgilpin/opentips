@@ -9,11 +9,12 @@ class Tip(BaseModel):
     directory: str
     file: str
     line: int
-    context: str
     type: str
-    complexity: str
     label: str
     description: str
+    priority: str
+    complexity: str
+    context: str
     deleted: Optional[bool] = False
 
     # TODO: Add created_at so that we can consider the age of the tip.
@@ -29,26 +30,6 @@ class Tip(BaseModel):
         if not isinstance(other, Tip):
             return False
         return self.id == other.id
-
-    @staticmethod
-    def parse_from_line(directory: str, line: str) -> "Tip":
-        parts = line.split(" - ")
-        try:
-            id, file_info, tip_type, complexity, label, description, *context = parts
-        except ValueError:
-            raise ValueError(f"Invalid Tip line format: {line}")
-
-        return Tip(
-            id=id,
-            directory=directory,
-            file=file_info.split(":")[0],
-            line=int(file_info.split(":")[1]),
-            type=tip_type,
-            complexity=complexity,
-            label=label,
-            description=description,
-            context=" - ".join(context),
-        )
 
     @staticmethod
     def validate_external_id(external_id: str, directory: str) -> None:
@@ -83,7 +64,7 @@ class Tip(BaseModel):
 
     def format_as_line(self) -> str:
         context_line = self.context.split("\n")[0]
-        return f"{self.id} {self.file}:{self.line} - {self.type} - {self.complexity} - {self.label} - {self.description} - {context_line}"
+        return f"{self.id} {self.file}:{self.line} - {self.type} - {self.label} - {self.priority} - {self.complexity} - {self.description} - {context_line}"
 
 
 class TipList(BaseModel):
