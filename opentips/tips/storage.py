@@ -182,7 +182,7 @@ def update_tip(tip: Tip) -> bool:
 
     tip_id = tip.id
     storage_dir = get_storage_dir("tips")
-    _, tip_digest = parse_tip_external_id(tip_id)
+    _, _, tip_digest = parse_tip_external_id(tip_id)
     tip_path = next(storage_dir.glob(f"*/{tip_digest}.json"), None)
 
     if tip_path is None:
