@@ -33,6 +33,11 @@ class Tip(BaseModel):
         return self.id == other.id
 
     @staticmethod
+    def add_padding(s: str) -> str:
+        """Add proper base64 padding to string"""
+        return s + "=" * (-len(s) % 4)
+
+    @staticmethod
     def validate_external_id(external_id: str, directory: str) -> None:
         """
         Parse an external ID into its constituent parts and validate it.
@@ -48,7 +53,9 @@ class Tip(BaseModel):
         Returns:
             The decoded tip ID
         """
-        decoded_id = base64.urlsafe_b64decode(external_id).decode("utf-8")
+        decoded_id = base64.urlsafe_b64decode(Tip.add_padding(external_id)).decode(
+            "utf-8"
+        )
         tokens = decoded_id.split("\n")
         version = tokens[0]
         if version not in {"1.0", "1.1"}:
