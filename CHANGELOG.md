@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v1.5.1 (2025-05-20)
+
+### Bug Fixes
+
+- Fix usage of parse_tip_external_id in update_tip
+  ([`325e921`](https://github.com/kgilpin/opentips/commit/325e9216e26ec639c2eb9093a3be45013501d523))
+
+
 ## v1.5.0 (2025-05-20)
 
 ### Bug Fixes
