@@ -24,14 +24,14 @@ class TestStorage(unittest.TestCase):
         # Clean up the temporary directory
         self.temp_dir.cleanup()
 
-    def tetxternal_id(self):
+    def test_external_id(self):
         # This is the encoded tip ID
         tip_id = "MS4wCi9Vc2Vycy9rZ2lscGluL3NvdXJjZS9rZ2lscGluL29wZW50aXBzLXZzY29kZQpEakowa3ZkbWNTeUFscmdtc2lhN013OV83SjVwb204NUVpN2M1eEk4ZktJ"
 
         # Parse the external ID
         version, directory, internal_id = parse_tip_external_id(tip_id)
 
-        self.assertEqual(version, "1.1")
+        self.assertEqual(version, "1.0")
         self.assertEqual(directory, "/Users/kgilpin/source/kgilpin/opentips-vscode")
         self.assertEqual(internal_id, "DjJ0kvdmcSyAlrgmsia7Mw9_7J5pom85Ei7c5xI8fKI")
 

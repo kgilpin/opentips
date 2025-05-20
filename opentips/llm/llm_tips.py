@@ -129,7 +129,7 @@ context: a snippet of code that provides the context for the tip. It should exac
     assert user_message != "", "User message must be provided"
 
     # Despite the prompt, the LLM keeps providing a PATH that is only the filename and not the full path
-    def is_directory_path(tip: Tip):
+    def is_directory_path(tip: LLMTip) -> bool:
         path_components = Path(tip.file).parts
         return len(path_components) > 1
 
@@ -146,9 +146,8 @@ context: a snippet of code that provides the context for the tip. It should exac
         logger.error(f"Error getting LLM tips: {str(e)}")
         return LLMTipList(tips=[])
 
-    for tip in tip_list:
-        if isinstance(tip, Tip):
-            if not is_directory_path(tip):
-                logger.warning(f"Tip file path is not a full path: {tip.file}")
+    for tip in tip_list.tips:
+        if not is_directory_path(tip):
+            logger.warning(f"Tip file path is not a full path: {tip.file}")
 
     return tip_list

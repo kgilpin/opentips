@@ -50,7 +50,7 @@ class Tip(BaseModel):
         decoded_id = base64.urlsafe_b64decode(external_id + "===").decode("utf-8")
         tokens = decoded_id.split("\n")
         version = tokens[0]
-        if version != "1.0":
+        if version not in {"1.0", "1.1"}:
             raise ValueError(f"Invalid tip ID format: {tokens[0]}")
 
         if len(tokens) != 3:
