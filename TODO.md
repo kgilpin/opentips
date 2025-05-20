@@ -1,7 +1,9 @@
 ## RPC
 
+- [ ] Ensure that all RPC methods return quickly, and emit events if they need to do more work.
 - [ ] Normalize across tips to eliminate duplicates
 - [ ] Don't re-analyze unchanged chunks of code
+- [x] Support a REVIEW.md file in the root of the workspace, to guide the generation of tips.
 - [x] Implement "priority" handling in the IDE extension.
 - [x] Use dash-case for tips
 - [x] Document the 'complete' event and 'complete_response' RPC method

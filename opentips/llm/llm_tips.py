@@ -42,7 +42,9 @@ TEMPERATURE = get_temperature(FACILITY_NAME, DEFAULT_TEMPERATURE)
 
 
 async def llm_tips(
-    diff_chunks: Optional[list[DiffChunk]], file_chunk: Optional[FileChunk]
+    diff_chunks: Optional[list[DiffChunk]],
+    file_chunk: Optional[FileChunk],
+    review_instructions: Optional[str] = None,
 ) -> LLMTipList:
     # Raises ValueError, which we will propagate.
     complete_fn = get_completion_handler()
@@ -120,8 +122,20 @@ context: a snippet of code that provides the context for the tip. It should exac
     that the user is working on.
 """
 
+    # Add project-specific review instructions if available
+    review_section = None
+    if review_instructions:
+        review_section = f"""Additionally, consider these project-specific instructions when suggesting tips:
+
+<review-instructions>
+{review_instructions}
+</review-instructions>
+"""
+        logger.info("Including project-specific review instructions")
+
     prompt = (
         [base_instructions]
+        + ([review_section] if review_section else [])
         + [instr for instr in (diff_instructions, chunk_instructions) if instr]
         + [examples]
     )

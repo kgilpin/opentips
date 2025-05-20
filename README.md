@@ -840,4 +840,37 @@ _then_ be used to determine which RPC process to invoke for further information 
 ## Optional Dependencies
 
 - To apply tips outside of the IDE environment: `aider-chat`
-````
+```
+
+## Customizing Tips with REVIEW.md
+
+OpenTips supports customizing the tip generation process by creating a `REVIEW.md` file in the root of your project. This file contains instructions that are incorporated into the prompt used by the LLM when generating tips.
+
+### Benefits of Using REVIEW.md
+
+- Customize the types of tips that are suggested
+- Focus tip generation on specific aspects of code quality
+- Add project-specific best practices
+- Include team coding standards
+- Guide the LLM to emphasize or de-emphasize certain types of suggestions
+
+### Example REVIEW.md
+
+```markdown
+# Code Review Guidelines
+
+When reviewing code in this project, please prioritize the following:
+
+1. Error handling - Ensure all functions handle errors appropriately
+2. Input validation - Check that user inputs are properly validated
+3. Memory management - Look for potential memory leaks
+4. Security best practices - Identify any security vulnerabilities
+5. Performance considerations - Suggest optimizations for CPU-intensive code
+
+Do not suggest:
+- Style changes that don't conform to our ESLint configuration
+- Refactorings that don't improve performance or readability
+- Changes to our test framework approach
+```
+
+The contents of REVIEW.md are added to the LLM prompt when generating tips, influencing the suggestions to align with your project's specific needs.

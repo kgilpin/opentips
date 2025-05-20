@@ -24,6 +24,7 @@ class Tip(BaseModel):
 
     def __hash__(self):
         # Create hash based on immutable identifying fields
+        # TODO: (bug) Hash function only uses id field, potentially leading to hash collisions if other fields differ but ids match.
         return hash((self.id))
 
     def __eq__(self, other):
@@ -47,7 +48,7 @@ class Tip(BaseModel):
         Returns:
             The decoded tip ID
         """
-        decoded_id = base64.urlsafe_b64decode(external_id + "===").decode("utf-8")
+        decoded_id = base64.urlsafe_b64decode(external_id).decode("utf-8")
         tokens = decoded_id.split("\n")
         version = tokens[0]
         if version not in {"1.0", "1.1"}:

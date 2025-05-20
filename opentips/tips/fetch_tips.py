@@ -9,6 +9,7 @@ from opentips.tips.git import DiffChunk
 
 from ..llm.llm_tips import FileChunk, LLMTipList, llm_tips
 from .storage import save_tip_if_new
+from .review import get_review_instructions
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,13 @@ async def fetch_tips_for_diff(diff: list[DiffChunk]) -> TipList:
         A list of programming tips relevant to the diff content
     """
     logger.debug("Fetching tips for diff %s", diff)
-    llm_tip_list = await llm_tips(diff, None)
+
+    # Get project-specific review instructions from REVIEW.md if available
+    review_instructions = get_review_instructions()
+    if review_instructions:
+        logger.info(f"Found REVIEW.md with instructions for tip generation")
+
+    llm_tip_list = await llm_tips(diff, None, review_instructions)
     return collect_tip_list(llm_tip_list)
 
 
@@ -44,6 +51,11 @@ async def fetch_tips_for_file_range(
         "Fetching tips for file range %s:%d-%d", file_name, start_line, end_line
     )
 
+    # Get project-specific review instructions from REVIEW.md if available
+    review_instructions = get_review_instructions()
+    if review_instructions:
+        logger.info(f"Found REVIEW.md with instructions for tip generation")
+
     if not Path(file_name).is_file():
         logger.error(f"File not found or is not a regular file: {file_name}")
         # We treat this error beningly because the user may have deleted the file
@@ -60,7 +72,7 @@ async def fetch_tips_for_file_range(
         end_line=end_line,
         content=file_content,
     )
-    llm_tip_list = await llm_tips(None, file_chunk)
+    llm_tip_list = await llm_tips(None, file_chunk, review_instructions)
     return collect_tip_list(llm_tip_list)
 
 
