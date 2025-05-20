@@ -1,6 +1,24 @@
 # CHANGELOG
 
 
+## v1.5.0 (2025-05-20)
+
+### Bug Fixes
+
+- Fix up base64 padding
+  ([`218162d`](https://github.com/kgilpin/opentips/commit/218162dd63e2fee11d35ef226089a17e674bd4b3))
+
+### Features
+
+- Read and incorporate REVIEW.md
+  ([`2af93de`](https://github.com/kgilpin/opentips/commit/2af93dece2e42db15eb57b6c7e36485dd8e7e032))
+
+1. Created a new module review.py to handle reading the REVIEW.md file from the project directory 2.
+  Modified the llm_tips.py to accept and incorporate review instructions in the LLM prompt 3.
+  Updated the fetch_tips_for_diff function to check for project-specific review instructions 4.
+  Added documentation to the README.md explaining how to use the REVIEW.md feature
+
+
 ## v1.4.1 (2025-05-20)
 
 ### Bug Fixes
